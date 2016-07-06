@@ -2,6 +2,7 @@
 #define __BYTEBEATVST__
 
 #include "IPlug_include_in_plug_hdr.h"
+#include "Oscillator.h"
 
 class BytebeatVST : public IPlug
 {
@@ -14,7 +15,9 @@ public:
   void ProcessDoubleReplacing(double** inputs, double** outputs, int nFrames);
 
 private:
-  double mGain;
+  double mFrequency;
+  void CreatePresets();
+  Oscillator mOscillator;
 };
 
 #endif

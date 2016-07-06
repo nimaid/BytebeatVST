@@ -21,7 +21,8 @@
 
 // http://service.steinberg.de/databases/plugin.nsf/plugIn?openForm
 // 4 chars, single quotes. At least one capital letter
-#define PLUG_UNIQUE_ID 'Ipef'
+#define PLUG_UNIQUE_ID 'ud9c'
+// http://service.steinberg.de/databases/plugin.nsf/replyall/ud9c?EditDocument
 // make sure this is not the same as BUNDLE_MFR
 #define PLUG_MFR_ID 'Acme'
 
@@ -34,7 +35,7 @@
 #endif
 
 #define PLUG_MFR_PT "nimaid\nnimaid\nAcme"
-#define PLUG_NAME_PT "BytebeatVST\nIPEF"
+#define PLUG_NAME_PT "BytebeatVST\nud9c"
 #define PLUG_TYPE_PT "Effect"
 #define PLUG_DOES_AUDIOSUITE 1
 
@@ -55,12 +56,14 @@ instrument determined by PLUG _IS _INST
 
 // Unique IDs for each image resource.
 #define KNOB_ID 101
+#define BACKGROUND_ID 102
 
 // Image resource locations for this plug.
 #define KNOB_FN "resources/img/knob.png"
+#define BACKGROUND_FN "resources/img/bg.png"
 
 // GUI default dimensions
-#define GUI_WIDTH 300
+#define GUI_WIDTH 400
 #define GUI_HEIGHT 300
 
 // on MSVC, you must define SA_API in the resource editor preprocessor macros as well as the c++ ones
