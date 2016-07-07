@@ -2,6 +2,7 @@
 #include "IPlug_include_in_plug_src.h"
 #include "IControl.h"
 #include "resource.h"
+#include <Python.h>
 
 const int kNumPrograms = 5;
 
@@ -47,6 +48,8 @@ BytebeatVST::BytebeatVST(IPlugInstanceInfo instanceInfo)
   AttachGraphics(pGraphics);
 
   CreatePresets();
+
+  Py_Initialize();
 }
 
 BytebeatVST::~BytebeatVST() {}
@@ -104,9 +107,9 @@ void BytebeatVST::OnParamChange(int paramIdx)
 }
 
 void BytebeatVST::ProcessMidiMsg(IMidiMsg* pMsg) {
-	if (pMsg->StatusMsg() == IMidiMsg::kNoteOff)
+	if ((pMsg->StatusMsg() == IMidiMsg::kNoteOff) && (pMsg->NoteNumber() == mMIDIReceiver.mLastNoteNumber))
 	{
-		// Reset the oscillator counter if note off
+		// Reset the oscillator counter if note off and there isn't another note being played
 		mOscillator.resetCounter();
 	}
 

@@ -1,8 +1,8 @@
 #include <math.h>
 #include <stdint.h>
 #include <string>
-
-using namespace std;
+#include <sstream>
+#include <Python.h>
 
 enum OscillatorMode {
 	OSCILLATOR_MODE_SINE,
@@ -22,16 +22,15 @@ private:
 	double mSampleRate;
 	double mCounterIncrement;
 	void updateIncrement();
-	uint8_t evaluateFormula(string evalFormula);
 public:
-	string formula;
+	std::string formula;
 	void setMode(OscillatorMode mode);
 	void setFrequency(double frequency);
 	void setSampleRate(double sampleRate);
 	void resetCounter();
 	inline void setMuted(bool muted) { isMuted = muted; }
 	double nextSample();
-	bool setFormula(string goFormula);
+	bool setFormula(std::string goFormula);
 	Oscillator() :
 		mOscillatorMode(OSCILLATOR_MODE_SQUARE),
 		mPI(2 * acos(0.0)),
@@ -41,6 +40,7 @@ public:
 		mCounter(0.0),
 		mSampleRate(44100.0) {
 		updateIncrement();
-		setFormula("t*(42&(t>>11))");
+		//setFormula("t*(42&(t>>11))");
+		setFormula("t");
 	};
 };

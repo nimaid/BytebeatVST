@@ -43,8 +43,6 @@
     </ClCompile>
     <ClCompile Include="Oscillator.cpp" />
     <ClCompile Include="MIDIReceiver.cpp" />
-    <ClCompile Include="cpp-expression-parser\packToken.cpp" />
-    <ClCompile Include="cpp-expression-parser\shunting-yard.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BytebeatVST.h" />
@@ -147,9 +145,6 @@
     </ClInclude>
     <ClInclude Include="Oscillator.h" />
     <ClInclude Include="MIDIReceiver.h" />
-    <ClInclude Include="cpp-expression-parser\packToken.h" />
-    <ClInclude Include="cpp-expression-parser\shunting-yard.h" />
-    <ClInclude Include="cpp-expression-parser\shunting-yard-exceptions.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="vst3">
