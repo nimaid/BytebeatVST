@@ -3,10 +3,6 @@
 //Bytebeats are 0-255, or 8 bit
 #define FORMULA_MODULO (double)(1 << 8)
 
-void Oscillator::setMode(OscillatorMode mode) {
-	mOscillatorMode = mode;
-}
-
 void Oscillator::setFrequency(double frequency) {
 	mFrequency = frequency;
 	updateIncrement();
@@ -33,26 +29,15 @@ bool Oscillator::setFormula(std::string goFormula) {
 
 double Oscillator::nextSample() {
 	double value = 0.0;
-	std::stringstream ss;
 	uint32_t t;
-	std::string tStr;
 	uint8_t result;
 
 	if (isMuted) return value;
 
 	t = (uint32_t)mCounter;
 
-	ss << t;
-	ss >> tStr;
-
-	tStr = "t = " + tStr + "\n";
-	const char *tChar = tStr.c_str();
-
-	PyRun_SimpleString(tChar);
-
 	// Main computation
-	//result = (uint8_t)(t*(42&(t>>11)));
-	PyRun_SimpleString(("result = " + formula).c_str());
+	result = (uint8_t)(t*(42&(t>>11)));
 
 	/*HERE IS WHERE I NEED TO GET THE result VAR FROM PYTHON*/
 
