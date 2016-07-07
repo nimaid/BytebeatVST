@@ -452,6 +452,9 @@ CALL ..\..\AAX_SDK\Utilities\CreatePackage.bat $(OutDir) ..\..\AAX_SDK\Utilities
     <ClCompile Include="..\..\WDL\IPlug\IPlugAAX.cpp" />
     <ClCompile Include="..\..\WDL\IPlug\AAX\IPlugAAX_Describe.cpp" />
     <ClCompile Include="BytebeatVST.cpp" />
+    <ClCompile Include="cpp-expression-parser\packToken.cpp" />
+    <ClCompile Include="cpp-expression-parser\shunting-yard.cpp" />
+    <ClCompile Include="MIDIReceiver.cpp" />
     <ClCompile Include="Oscillator.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -503,6 +506,10 @@ CALL ..\..\AAX_SDK\Utilities\CreatePackage.bat $(OutDir) ..\..\AAX_SDK\Utilities
     <ClInclude Include="..\..\WDL\IPlug\AAX\AAX_CIPlugParameters.h" />
     <ClInclude Include="..\..\WDL\IPlug\IPlugAAX.h" />
     <ClInclude Include="BytebeatVST.h" />
+    <ClInclude Include="cpp-expression-parser\packToken.h" />
+    <ClInclude Include="cpp-expression-parser\shunting-yard-exceptions.h" />
+    <ClInclude Include="cpp-expression-parser\shunting-yard.h" />
+    <ClInclude Include="MIDIReceiver.h" />
     <ClInclude Include="Oscillator.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

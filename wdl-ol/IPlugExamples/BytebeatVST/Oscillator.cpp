@@ -1,5 +1,8 @@
 #include "Oscillator.h"
 
+//Bytebeats are 0-255, or 8 bit
+#define FORMULA_MODULO (double)(1 << 8)
+
 void Oscillator::setMode(OscillatorMode mode) {
 	mOscillatorMode = mode;
 }
@@ -15,53 +18,57 @@ void Oscillator::setSampleRate(double sampleRate) {
 }
 
 void Oscillator::updateIncrement() {
-	mPhaseIncrement = mFrequency * 2 * mPI / mSampleRate;
+	// This will be used to make mCounter go linearly in range [0, 256) at mFrequency
+	mCounterIncrement = (mFrequency * FORMULA_MODULO) / mSampleRate;
 }
 
-void Oscillator::generate(double* buffer, int nFrames) {
-	const double twoPI = 2 * mPI;
-	switch (mOscillatorMode) {
-	case OSCILLATOR_MODE_SINE:
-		for (int i = 0; i < nFrames; i++) {
-			buffer[i] = sin(mPhase);
-			mPhase += mPhaseIncrement;
-			while (mPhase >= twoPI) {
-				mPhase -= twoPI;
-			}
-		}
-		break;
-	case OSCILLATOR_MODE_SAW:
-		for (int i = 0; i < nFrames; i++) {
-			buffer[i] = 1.0 - (2.0 * mPhase / twoPI);
-			mPhase += mPhaseIncrement;
-			while (mPhase >= twoPI) {
-				mPhase -= twoPI;
-			}
-		}
-		break;
-	case OSCILLATOR_MODE_SQUARE:
-		for (int i = 0; i < nFrames; i++) {
-			if (mPhase <= mPI) {
-				buffer[i] = 1.0;
-			}
-			else {
-				buffer[i] = -1.0;
-			}
-			mPhase += mPhaseIncrement;
-			while (mPhase >= twoPI) {
-				mPhase -= twoPI;
-			}
-		}
-		break;
-	case OSCILLATOR_MODE_TRIANGLE:
-		for (int i = 0; i < nFrames; i++) {
-			double value = -1.0 + (2.0 * mPhase / twoPI);
-			buffer[i] = 2.0 * (fabs(value) - 0.5);
-			mPhase += mPhaseIncrement;
-			while (mPhase >= twoPI) {
-				mPhase -= twoPI;
-			}
-		}
-		break;
+void Oscillator::resetCounter() {
+	mCounter = 0.;
+}
+
+uint8_t Oscillator::evaluateFormula(string evalFormula)
+{
+
+}
+
+bool Oscillator::setFormula(string goFormula)
+{
+	
+	string allowedSubstrings[] = {"(", ")", "t", "<<", ">>", "&", "|", "^", "*", "+", "-", "/", "%"};
+
+	for(int i = 0; i < goFormula.length(); i++)
+	{
+		for(int j = 0; j < allowedSubstrings)
 	}
+
+	formula == goFormula;
+}
+
+double Oscillator::nextSample() {
+	double value = 0.0;
+	uint32_t t;
+	uint8_t result;
+
+	if (isMuted) return value;
+	
+	// Convert running float to a 32 bit uint
+	t = (uint32_t)mCounter;
+
+	// Main formula
+	result =(uint8_t)(t*(42&(t>>11)));
+
+	//Formula conditioning/normalization
+	value = ((2. * (double)result) / FORMULA_MODULO) - 1.;
+
+	// Increment and float modulo
+	mCounter += mCounterIncrement;
+	
+	/*
+	while (mCounter >= (double)(1 << 32))
+	{
+		mCounter -= (double)(1 << 32);
+	}
+	*/
+	
+	return value;
 }
