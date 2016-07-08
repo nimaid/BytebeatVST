@@ -37,7 +37,7 @@ class ExpressionTree
 private:
 	std::map<std::string, int> precedence;
 	TreeNode *treeRoot;
-	bool insert(bool first, TreeNode *leaf);
+	TreeNode *insertNode(TreeNode *leaf);
 	void destroyTree(TreeNode *leaf);
 public:
 	ExpressionTree();

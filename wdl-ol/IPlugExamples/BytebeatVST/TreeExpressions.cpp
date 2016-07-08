@@ -66,7 +66,7 @@ uint32_t TreeNode::evaluate(uint32_t tVal)
 	if (isOp)
 	{
 		//if it's an op
-		return( opFunc( (*first).evaluate(tVal), (*last).evaluate(tVal) ) );
+		return( opFunc( first->evaluate(tVal), last->evaluate(tVal) ) );
 	}
 	else if (isVar)
 	{
@@ -114,29 +114,23 @@ void ExpressionTree::destroyTree(TreeNode *leaf)
 	}
 }
 
-bool ExpressionTree::insert(bool first, TreeNode *leaf)
+TreeNode *ExpressionTree::insertNode(TreeNode *leaf)
 {
-	if (first)
+	if (leaf->first == NULL)
 	{
-		if (leaf->first != NULL)
-			return(false);
-		else
-		{
-			leaf->first = new TreeNode;
-			leaf->first->first = NULL;
-			leaf->first->last = NULL;
-		}
+        leaf->first = new TreeNode;
+        leaf->first->first = NULL;
+        leaf->first->last = NULL;
+        leaf->first->parent = leaf;
+        return(leaf->first);
 	}
 	else
 	{
-		if (leaf->last != NULL)
-			return(false);
-		else
-		{
-			leaf->last = new TreeNode;
-			leaf->last->first = NULL;
-			leaf->last->last = NULL;
-		}
+        leaf->last = new TreeNode;
+        leaf->last->first = NULL;
+        leaf->last->last = NULL;
+        leaf->last->parent = leaf;
+        return(leaf->last);
 	}
 }
 
@@ -149,7 +143,7 @@ bool ExpressionTree::build(std::string formulaStr)
 {
 	std::string::iterator stringIterator;
 	std::vector<std::string>::iterator stringVectorIterator;
-	
+
 	std::vector<std::string> formulaTokens;
 	std::vector<std::string> pnTokens;
 	std::stack<std::string> stringStack;
@@ -273,7 +267,7 @@ bool ExpressionTree::build(std::string formulaStr)
 	std::reverse(pnTokens.begin(), pnTokens.end());
 
 	//if it's gotten this far, the formula was valid
-	//destory the current tree to make room
+	//destroy the current tree to make room
 	destroyTree();
 
 	//parse polish notation into tree
@@ -284,18 +278,24 @@ bool ExpressionTree::build(std::string formulaStr)
 		{
 			//if the token is an operator
 			currentNode->setOp(currToken);
-			
-			TreeNode *newNode;
-			TreeNode *parentNode = currentNode;
-			
-			//a new operator node will always have the first branch free
-			currentNode->first = newNode;
-			currentNode = newNode;
-			currentNode->parent = parentNode;
+
+			currentNode = insertNode(currentNode);
 		}
 		else
 		{
 			//if it's a number or a variable
+			if (currentNode->first != NULL)
+            {
+                //if the current node has it's first branch initialized
+                while (currentNode->last != NULL)
+                {
+                    //while the last branch is initialized
+                    currentNode = currentNode->parent;
+                }
+
+                currentNode = insertNode(currentNode);
+            }
+
 			if (std::all_of(currToken.begin(), currToken.end(), ::isdigit))
 			{
 				//if it's a number
@@ -306,9 +306,9 @@ bool ExpressionTree::build(std::string formulaStr)
 				//if it's something else, a variable
 				currentNode->setVar();
 			}
-			
+
 			currentNode = currentNode->parent;
-			
+
 			//since we just moved up, we know at least the first branch is used
 			//so only check the last
 			while (currentNode->last != NULL)
