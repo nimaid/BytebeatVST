@@ -2,7 +2,6 @@
 #include "IPlug_include_in_plug_src.h"
 #include "IControl.h"
 #include "resource.h"
-#include <Python.h>
 
 const int kNumPrograms = 5;
 
@@ -48,8 +47,6 @@ BytebeatVST::BytebeatVST(IPlugInstanceInfo instanceInfo)
   AttachGraphics(pGraphics);
 
   CreatePresets();
-
-  Py_Initialize();
 }
 
 BytebeatVST::~BytebeatVST() {}

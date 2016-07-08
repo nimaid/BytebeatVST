@@ -22,24 +22,23 @@ void Oscillator::resetCounter() {
 	mCounter = 0.;
 }
 
-bool Oscillator::setFormula(std::string goFormula) {
-	formula == goFormula;
+bool Oscillator::setFormula(std::string formulaIn) {
+	formula == formulaIn;
+
 	return(true);
 }
 
 double Oscillator::nextSample() {
 	double value = 0.0;
-	uint32_t t;
 	uint8_t result;
 
 	if (isMuted) return value;
 
-	t = (uint32_t)mCounter;
+	uint32_t t = (uint32_t)mCounter;
 
 	// Main computation
-	result = (uint8_t)(t*(42&(t>>11)));
-
-	/*HERE IS WHERE I NEED TO GET THE result VAR FROM PYTHON*/
+	//result = (uint8_t)(t*(42&(t>>11)));
+	result = rootNode.Evaluate(t);
 
 	//Formula conditioning/normalization
 	value = ((2. * (double)result) / FORMULA_MODULO) - 1.;

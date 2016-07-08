@@ -1,6 +1,9 @@
 #include <math.h>
-#include <stdint.h>
+#include <cstdint>
 #include <string>
+#include <stack>
+#include <deque>
+#include "TreeExpressions.h"
 
 class Oscillator {
 private:
@@ -10,6 +13,7 @@ private:
 	double mSampleRate;
 	double mCounterIncrement;
 	void updateIncrement();
+	TreeNode rootNode;
 public:
 	std::string formula;
 	void setFrequency(double frequency);
@@ -17,7 +21,7 @@ public:
 	void resetCounter();
 	inline void setMuted(bool muted) { isMuted = muted; }
 	double nextSample();
-	bool setFormula(std::string goFormula);
+	bool setFormula(std::string formulaIn);
 	Oscillator() :
 		isMuted(true),
 		mFrequency(440.0),
