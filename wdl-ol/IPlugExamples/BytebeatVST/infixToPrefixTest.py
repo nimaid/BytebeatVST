@@ -2,7 +2,7 @@ def infixToPrefix(infix):
     stack = []
     output = []
 
-    precedence = {'^': 3, '*': 2, '/': 2, '+': 1, '-': 1}
+    precedence = {'^': 1, '*': 2, '/': 2, '+': 3, '-': 3}
 
     infix.reverse()
 
@@ -20,7 +20,7 @@ def infixToPrefix(infix):
         elif x in precedence:
             if len(stack) > 0:
                 if stack[-1] != ')':
-                    while precedence[stack[-1]] >= precedence[x]:
+                    while precedence[stack[-1]] <= precedence[x]:
                         temp = stack.pop()
                         
                         if temp != ')':

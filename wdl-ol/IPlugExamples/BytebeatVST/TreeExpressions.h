@@ -1,5 +1,9 @@
 #include <cstdint>
 #include <string>
+#include <map>
+#include <stack>
+#include <vector>
+#include <algorithm>
 
 struct TreeNode {
 private:
@@ -21,6 +25,7 @@ private:
 public:
 	TreeNode *first;
 	TreeNode *last;
+	TreeNode *parent;
 	uint32_t evaluate(uint32_t tVal);
 	void setOp(std::string op);
 	void setVal(uint32_t val);
@@ -30,6 +35,7 @@ public:
 class ExpressionTree
 {
 private:
+	std::map<std::string, int> precedence;
 	TreeNode *treeRoot;
 	bool insert(bool first, TreeNode *leaf);
 	void destroyTree(TreeNode *leaf);
@@ -38,4 +44,5 @@ public:
 	~ExpressionTree();
 	void destroyTree();
 	bool build(std::string formulaStr);
+	uint8_t evaluate(uint32_t tVal);
 };

@@ -326,6 +326,7 @@ if exist "%programfiles(x86)%" (copy /y "$(TargetPath)" "$(VST3_64_PATH)\Bytebea
     <ClInclude Include="MIDIReceiver.h" />
     <ClInclude Include="Oscillator.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="TreeExpressions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\VST3_SDK\pluginterfaces\base\funknown.cpp" />
@@ -344,6 +345,7 @@ if exist "%programfiles(x86)%" (copy /y "$(TargetPath)" "$(VST3_64_PATH)\Bytebea
     <ClCompile Include="BytebeatVST.cpp" />
     <ClCompile Include="MIDIReceiver.cpp" />
     <ClCompile Include="Oscillator.cpp" />
+    <ClCompile Include="TreeExpressions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BytebeatVST.rc" />

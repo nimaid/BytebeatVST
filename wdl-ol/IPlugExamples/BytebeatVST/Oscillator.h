@@ -13,7 +13,7 @@ private:
 	double mSampleRate;
 	double mCounterIncrement;
 	void updateIncrement();
-	TreeNode rootNode;
+	ExpressionTree formulaTree;
 public:
 	std::string formula;
 	void setFrequency(double frequency);

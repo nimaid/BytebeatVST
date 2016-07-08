@@ -25,7 +25,7 @@ void Oscillator::resetCounter() {
 bool Oscillator::setFormula(std::string formulaIn) {
 	formula == formulaIn;
 
-	return(true);
+	return(formulaTree.build(formula));
 }
 
 double Oscillator::nextSample() {
@@ -38,7 +38,7 @@ double Oscillator::nextSample() {
 
 	// Main computation
 	//result = (uint8_t)(t*(42&(t>>11)));
-	result = rootNode.Evaluate(t);
+	result = formulaTree.evaluate(t);
 
 	//Formula conditioning/normalization
 	value = ((2. * (double)result) / FORMULA_MODULO) - 1.;
