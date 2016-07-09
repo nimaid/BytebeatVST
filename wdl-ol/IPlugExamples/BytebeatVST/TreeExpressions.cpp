@@ -5,6 +5,7 @@ void TreeNode::setOp(std::string op)
 	isVar = false;
 	isOp = true;
 
+    
 	if (op == "^")
 	{
 		opFunc = &xorOp;
@@ -45,6 +46,7 @@ void TreeNode::setOp(std::string op)
 	{
 		opFunc = &modOp;
 	}
+	
 }
 
 void TreeNode::setVal(uint32_t val)
@@ -119,16 +121,12 @@ TreeNode *ExpressionTree::insertNode(TreeNode *leaf)
 	if (leaf->first == NULL)
 	{
         leaf->first = new TreeNode;
-        leaf->first->first = NULL;
-        leaf->first->last = NULL;
         leaf->first->parent = leaf;
         return(leaf->first);
 	}
 	else
 	{
         leaf->last = new TreeNode;
-        leaf->last->first = NULL;
-        leaf->last->last = NULL;
         leaf->last->parent = leaf;
         return(leaf->last);
 	}
@@ -150,35 +148,29 @@ bool ExpressionTree::build(std::string formulaStr)
 	std::string currentNumString = "";
 	std::string currentTokenString = "";
 	std::stack<TreeNode> nodeStack;
-	TreeNode *currentNode = treeRoot;
+	TreeNode *currentNode;
 	std::string currToken;
+	bool treeIsDone;
 
 	//tokenization
+
 	for (stringIterator = formulaStr.begin(); stringIterator != formulaStr.end(); stringIterator++)
 	{
 		std::string currCharString(1, *stringIterator);
-
-		/*
-		if ((currentTokenString.length() > 0) && !((precedence.find(currCharString) != precedence.end()) || (currCharString == "(") || (currCharString == ")") || std::all_of(currCharString.begin(), currCharString.end(), ::isdigit) || (currCharString == "t")))
-		{
-			//if there is something in the current token string, and the  current char string is not any other case
-
-		}
-		*/
 
 		currentTokenString.push_back(*stringIterator);
 
 		if ((precedence.find(currentTokenString) != precedence.end()) || (currentTokenString == "(") || (currentTokenString == ")"))
 		{
 			//if the current token string is found in the precedence list (or is a parentheses)
-			formulaTokens.push_back(currentTokenString);
-			currentTokenString = "";
-
 			if (currentNumString != "")
 			{
 				formulaTokens.push_back(currentNumString);
 				currentNumString = "";
 			}
+
+			formulaTokens.push_back(currentTokenString);
+			currentTokenString = "";
 		}
 		else if (std::all_of(currentTokenString.begin(), currentTokenString.end(), ::isdigit))
 		{
@@ -195,27 +187,29 @@ bool ExpressionTree::build(std::string formulaStr)
 	}
 
 	//convert to polish notation
+
 	std::reverse(formulaTokens.begin(), formulaTokens.end());
 
 	stringStack.push(")");
 
 	for (stringVectorIterator = formulaTokens.begin(); stringVectorIterator != formulaTokens.end(); stringVectorIterator++)
 	{
-		if ((precedence.find(*stringVectorIterator) == precedence.end()) && (*stringVectorIterator != "(") && (*stringVectorIterator != ")"))
+		currToken = *stringVectorIterator;
+		if ((precedence.find(currToken) == precedence.end()) && (currToken != "(") && (currToken != ")"))
 		{
-			pnTokens.push_back(*stringVectorIterator);
+			pnTokens.push_back(currToken);
 		}
-		else if (*stringVectorIterator == ")")
+		else if (currToken == ")")
 		{
-			stringStack.push(*stringVectorIterator);
+			stringStack.push(currToken);
 		}
-		else if (precedence.find(*stringVectorIterator) != precedence.end())
+		else if (precedence.find(currToken) != precedence.end())
 		{
 			if (stringStack.size() > 0)
 			{
 				if (stringStack.top() != ")")
 				{
-					while (precedence[stringStack.top()] <= precedence[*stringVectorIterator])
+					while (precedence[stringStack.top()] <= precedence[currToken])
 					{
 						if (stringStack.top() != ")")
 						{
@@ -235,9 +229,9 @@ bool ExpressionTree::build(std::string formulaStr)
 					}
 				}
 			}
-			stringStack.push(*stringVectorIterator);
+			stringStack.push(currToken);
 		}
-		else if (*stringVectorIterator == "(")
+		else if (currToken == "(")
 		{
 			if (stringStack.size() > 0)
 			{
@@ -251,6 +245,8 @@ bool ExpressionTree::build(std::string formulaStr)
 						break;
 					}
 				}
+
+				stringStack.pop();
 			}
 		}
 	}
@@ -260,17 +256,22 @@ bool ExpressionTree::build(std::string formulaStr)
 		if (stringStack.top() != ")")
 		{
 			pnTokens.push_back(stringStack.top());
-			stringStack.pop();
 		}
+		stringStack.pop();
 	}
 
 	std::reverse(pnTokens.begin(), pnTokens.end());
 
 	//if it's gotten this far, the formula was valid
 	//destroy the current tree to make room
+
 	destroyTree();
 
 	//parse polish notation into tree
+	treeRoot = new TreeNode;
+	currentNode = treeRoot;
+	treeIsDone = false;
+
 	for (stringVectorIterator = pnTokens.begin(); stringVectorIterator != pnTokens.end(); stringVectorIterator++)
 	{
 		currToken = *stringVectorIterator;
@@ -307,7 +308,10 @@ bool ExpressionTree::build(std::string formulaStr)
 				currentNode->setVar();
 			}
 
-			currentNode = currentNode->parent;
+			if (currentNode != treeRoot)
+			{
+				currentNode = currentNode->parent;
+			}
 
 			//since we just moved up, we know at least the first branch is used
 			//so only check the last
@@ -317,10 +321,17 @@ bool ExpressionTree::build(std::string formulaStr)
 				if (currentNode == treeRoot)
 				{
 					//if we're at the root, and it's totally populated
+					treeIsDone = true;
 					break;
 				}
 
 				currentNode = currentNode->parent;
+			}
+
+			if (!treeIsDone)
+			{
+				
+				currentNode = insertNode(currentNode);
 			}
 		}
 	}

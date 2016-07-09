@@ -3,6 +3,20 @@
 //Bytebeats are 0-255, or 8 bit
 #define FORMULA_MODULO (double)(1 << 8)
 
+Oscillator::Oscillator()
+{
+	isMuted = true;
+	mFrequency = 440.0;
+	mCounter = 0.0;
+	mSampleRate = 44100.0;
+	updateIncrement();
+	//setFormula("t");
+	//setFormula("t*(42&(t>>11))"); //PROBLEM
+	//setFormula("t*((42&(t>>11))%24)"); //PROBLEM
+	//setFormula("(t&t%255)-(t>>13&(t%(t>>8|t>>16)))");
+	setFormula("((50*t)/50)*5&(((50*t)/50)>>7)|((50*t*3)/50)&(t*4>>10)");
+}
+
 void Oscillator::setFrequency(double frequency) {
 	mFrequency = frequency;
 	updateIncrement();
@@ -23,25 +37,28 @@ void Oscillator::resetCounter() {
 }
 
 bool Oscillator::setFormula(std::string formulaIn) {
-	formula == formulaIn;
-
-	return(formulaTree.build(formula));
+	return(formulaTree.build(formulaIn));
 }
 
 double Oscillator::nextSample() {
 	double value = 0.0;
-	uint8_t result;
+	double result;
 
 	if (isMuted) return value;
 
 	uint32_t t = (uint32_t)mCounter;
 
 	// Main computation
-	//result = (uint8_t)(t*(42&(t>>11)));
-	result = formulaTree.evaluate(t);
+	result = (double)formulaTree.evaluate(t);
 
 	//Formula conditioning/normalization
-	value = ((2. * (double)result) / FORMULA_MODULO) - 1.;
+	while (result >= (FORMULA_MODULO / 2.))
+	{
+		result -= FORMULA_MODULO;
+	}
+
+	value = (2. * (double)result) / FORMULA_MODULO;
+
 
 	// Increment and float modulo
 	mCounter += mCounterIncrement;
