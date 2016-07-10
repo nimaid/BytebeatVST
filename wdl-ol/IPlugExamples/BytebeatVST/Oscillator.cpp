@@ -11,10 +11,10 @@ Oscillator::Oscillator()
 	mSampleRate = 44100.0;
 	updateIncrement();
 	//setFormula("t");
-	//setFormula("t*(42&(t>>11))"); //PROBLEM
-	//setFormula("t*((42&(t>>11))%24)"); //PROBLEM
-	//setFormula("(t&t%255)-(t>>13&(t%(t>>8|t>>16)))");
-	setFormula("((50*t)/50)*5&(((50*t)/50)>>7)|((50*t*3)/50)&(t*4>>10)");
+	setFormula("(t)*5&((t)>>7)|(t*3)&(t*4>>10)");
+	//setFormula("t*(42&(t>>11))");
+	//setFormula("t*((42&(t>>11))%24)");
+	//setFormula("(t)*5&((t)>>7)|(t*3)&(t*4>>10)");
 }
 
 void Oscillator::setFrequency(double frequency) {
@@ -37,7 +37,8 @@ void Oscillator::resetCounter() {
 }
 
 bool Oscillator::setFormula(std::string formulaIn) {
-	return(formulaTree.build(formulaIn));
+	formulaTree.build(formulaIn);
+	return(true);
 }
 
 double Oscillator::nextSample() {

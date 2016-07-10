@@ -137,14 +137,19 @@ void ExpressionTree::destroyTree()
 	destroyTree(treeRoot);
 }
 
-bool ExpressionTree::build(std::string formulaStr)
+std::vector<std::string> ExpressionTree::build(std::string formulaStr)
 {
 	std::string::iterator stringIterator;
 	std::vector<std::string>::iterator stringVectorIterator;
 
+	std::vector<std::string> retVal;
+	std::deque<std::string> formulaTokensToAppend;
+	std::string formulaTokenToAppend;
+	int lParems = 0;
 	std::vector<std::string> formulaTokens;
 	std::vector<std::string> pnTokens;
 	std::stack<std::string> stringStack;
+	std::string lastToken = "";
 	std::string currentNumString = "";
 	std::string currentTokenString = "";
 	std::stack<TreeNode> nodeStack;
@@ -165,29 +170,199 @@ bool ExpressionTree::build(std::string formulaStr)
 			//if the current token string is found in the precedence list (or is a parentheses)
 			if (currentNumString != "")
 			{
-				formulaTokens.push_back(currentNumString);
+				formulaTokensToAppend.push_back(currentNumString);
 				currentNumString = "";
 			}
 
-			formulaTokens.push_back(currentTokenString);
+			formulaTokensToAppend.push_back(currentTokenString);
 			currentTokenString = "";
 		}
-		else if (std::all_of(currentTokenString.begin(), currentTokenString.end(), ::isdigit))
+		else if (std::all_of(currCharString.begin(), currCharString.end(), ::isdigit))
 		{
-			//if the current token string is all digits
+			//if the current char string is all digits
+
+			if (!std::all_of(currentTokenString.begin(), currentTokenString.end(), ::isdigit))
+			{
+				//if the current token string is not all digits
+				currentTokenString.pop_back();
+				retVal.push_back(currentTokenString);
+				retVal.push_back(ETBUILD_UNRECOTOK);
+				return(retVal);
+			}
+
 			currentNumString.append(currentTokenString);
 			currentTokenString = "";
 		}
-		else if (currentTokenString == "t")
+		else if (currCharString == "t")
 		{
 			//if the current token string is the t variable
-			formulaTokens.push_back(currentTokenString);
+
+			if (currentNumString != "")
+			{
+				formulaTokensToAppend.push_back(currentNumString);
+				currentNumString = "";
+			}
+
+			if (currentTokenString != currCharString)
+			{
+				//if the current token string is not just the variable
+				currentTokenString.pop_back();
+				retVal.push_back(currentTokenString);
+				retVal.push_back(ETBUILD_UNRECOTOK);
+				return(retVal);
+			}
+
+			formulaTokensToAppend.push_back(currentTokenString);
 			currentTokenString = "";
+		}
+
+		if (stringIterator + 1 == formulaStr.end())
+		{
+			//if this is the last char in the formula
+			if (currentNumString.size() > 0)
+			{
+				formulaTokensToAppend.push_back(currentNumString);
+				currentNumString = "";
+			}
+		}
+
+		//here is the central location where we append tokens, if any
+		//this is a good place to perform forward token checking
+		while (formulaTokensToAppend.size() > 0)
+		{
+			formulaTokenToAppend = formulaTokensToAppend.front();
+			formulaTokensToAppend.pop_front();
+
+			if (formulaTokenToAppend == "t")
+			{
+				//if token is a variable
+				if (formulaTokens.size() > 0)
+				{
+					if (formulaTokens.back() == ")")
+					{
+						retVal.push_back(ETBUILD_RPARENVAR);
+						return(retVal);
+					}
+
+					if ((formulaTokens.back() == "t") || (std::all_of(formulaTokens.back().begin(), formulaTokens.back().end(), ::isdigit)))
+					{
+						retVal.push_back(formulaTokenToAppend);
+						retVal.push_back(ETBUILD_VARMISSOP);
+						return(retVal);
+					}
+				}
+			}
+			else if (std::all_of(formulaTokenToAppend.begin(), formulaTokenToAppend.end(), ::isdigit))
+			{
+				//if token is a number
+				if (formulaTokens.size() > 0)
+				{
+					if (formulaTokens.back() == ")")
+					{
+						retVal.push_back(ETBUILD_RPARENNUM);
+						return(retVal);
+					}
+
+					if ((formulaTokens.back() == "t") || (std::all_of(formulaTokens.back().begin(), formulaTokens.back().end(), ::isdigit)))
+					{
+						retVal.push_back(formulaTokenToAppend);
+						retVal.push_back(ETBUILD_NUMMISSOP);
+						return(retVal);
+					}
+				}
+			}
+			else if (precedence.find(formulaTokenToAppend) != precedence.end())
+			{
+				//if token is an operator
+				if (stringIterator == formulaStr.begin())
+				{
+					retVal.push_back(formulaTokenToAppend);
+					retVal.push_back(ETBUILD_OPATSTART);
+					return(retVal);
+				}
+
+				if (stringIterator + 1 == formulaStr.end())
+				{
+					retVal.push_back(formulaTokenToAppend);
+					retVal.push_back(ETBUILD_OPATEND);
+					return(retVal);
+				}
+
+				if (formulaTokens.size() > 0)
+				{
+					if (precedence.find(formulaTokens.back()) != precedence.end())
+					{
+						retVal.push_back(formulaTokens.back());
+						retVal.push_back(formulaTokenToAppend);
+						retVal.push_back(ETBUILD_OPSTOUCH);
+						return(retVal);
+					}
+				}
+			}
+			else if (formulaTokenToAppend == "(")
+			{
+				//if token is a left paren
+				lParems++;
+
+				if (formulaTokens.size() > 0)
+				{
+					if (formulaTokens.back() == ")")
+					{
+						//if there is a set of parens with no operator (or anything) between them
+						retVal.push_back(ETBUILD_PARENSMISSOP);
+						return(retVal);
+
+					}
+
+					if (formulaTokens.back() == "t")
+					{
+						retVal.push_back(ETBUILD_LPARENVAR);
+						return(retVal);
+					}
+
+					if (std::all_of(formulaTokens.back().begin(), formulaTokens.back().end(), ::isdigit))
+					{
+						retVal.push_back(ETBUILD_LPARENNUM);
+						return(retVal);
+					}
+				}
+			}
+			else if (formulaTokenToAppend == ")")
+			{
+				//if token is a right paren
+				lParems--;
+
+				if (formulaTokens.size() > 0)
+				{
+					if (formulaTokens.back() == "(")
+					{
+						//if there is a set of empty parens
+						retVal.push_back(ETBUILD_PARENSEMPTY);
+						return(retVal);
+					}
+				}
+			}
+
+			formulaTokens.push_back(formulaTokenToAppend);
 		}
 	}
 
-	//convert to polish notation
+	if (lParems < 0)
+	{
+		//if there were unmatched right parens
+		retVal.push_back(ETBUILD_UNMATCHRPAREN);
+		return(retVal);
+	}
+	else if (lParems > 0)
+	{
+		//if there were unmatched left parens
+		retVal.push_back(ETBUILD_UNMATCHLPAREN);
+		return(retVal);
+	}
 
+	//if it's gotten this far, the formula was valid
+
+	//convert to polish notation
 	std::reverse(formulaTokens.begin(), formulaTokens.end());
 
 	stringStack.push(")");
@@ -195,8 +370,11 @@ bool ExpressionTree::build(std::string formulaStr)
 	for (stringVectorIterator = formulaTokens.begin(); stringVectorIterator != formulaTokens.end(); stringVectorIterator++)
 	{
 		currToken = *stringVectorIterator;
+
 		if ((precedence.find(currToken) == precedence.end()) && (currToken != "(") && (currToken != ")"))
 		{
+			//if the current token is not an operator or a paren
+			//so, if it's variable or a number
 			pnTokens.push_back(currToken);
 		}
 		else if (currToken == ")")
@@ -205,6 +383,7 @@ bool ExpressionTree::build(std::string formulaStr)
 		}
 		else if (precedence.find(currToken) != precedence.end())
 		{
+			//if the current token is an operator
 			if (stringStack.size() > 0)
 			{
 				if (stringStack.top() != ")")
@@ -233,6 +412,7 @@ bool ExpressionTree::build(std::string formulaStr)
 		}
 		else if (currToken == "(")
 		{
+			//if the current token is a right paren (represented as a left paren)
 			if (stringStack.size() > 0)
 			{
 				while (stringStack.top() != ")")
@@ -249,6 +429,8 @@ bool ExpressionTree::build(std::string formulaStr)
 				stringStack.pop();
 			}
 		}
+
+		lastToken = currToken;
 	}
 
 	while (stringStack.size() > 0)
@@ -262,9 +444,7 @@ bool ExpressionTree::build(std::string formulaStr)
 
 	std::reverse(pnTokens.begin(), pnTokens.end());
 
-	//if it's gotten this far, the formula was valid
 	//destroy the current tree to make room
-
 	destroyTree();
 
 	//parse polish notation into tree
@@ -335,7 +515,9 @@ bool ExpressionTree::build(std::string formulaStr)
 			}
 		}
 	}
-	return(true);
+
+	retVal.push_back(ETBUILD_SUCCESS);
+	return(retVal);
 }
 
 uint8_t ExpressionTree::evaluate(uint32_t tVal)

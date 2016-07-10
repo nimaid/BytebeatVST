@@ -3,7 +3,35 @@
 #include <map>
 #include <stack>
 #include <vector>
+#include <deque>
 #include <algorithm>
+
+//define ExpressionTree::build error codes
+
+//non-error
+#define ETBUILD_SUCCESS "SUCCESS" //succussfuly built tree
+
+//tokenization errors
+#define ETBUILD_UNRECOTOK "UNRECOTOK" //unrecognized token
+
+//operator errors
+#define ETBUILD_OPSTOUCH "OPSTOUCH" //two operators are immediately next to each other
+#define ETBUILD_OPATSTART "OPATSTART" //the first first token is an operator
+#define ETBUILD_OPATEND "OPATEND" //the last first token is an operator
+
+//operand errors
+#define ETBUILD_VARMISSOP "VARMISSOP" //variable has no operator between it and another operand before it
+#define ETBUILD_NUMMISSOP "NUMMISSOP" //number has no operator between it and another operand before it
+
+//paren errors
+#define ETBUILD_PARENSMISSOP "PARENSMISSOP" //right and left parens have no operator between them
+#define ETBUILD_PARENSEMPTY "PARENSEMPTY" //left and right parens have nothing between them
+#define ETBUILD_LPARENVAR "LPARENVAR" //left paren has variable before it instead of another left paren or an operator
+#define ETBUILD_LPARENNUM "LPARENNUM" //left paren has number before it instead of another left paren or an operator
+#define ETBUILD_RPARENVAR "RPARENVAR" //right paren has variable after it instead of another right paren or an operator
+#define ETBUILD_RPARENNUM "RPARENNUM" //right paren has number after it instead of another right paren or an operator
+#define ETBUILD_UNMATCHLPAREN "UNMATCHLPAREN" //unmatched left paren
+#define ETBUILD_UNMATCHRPAREN "UNMATCHRPAREN" //unmatched right paren
 
 struct TreeNode {
 private:
@@ -43,6 +71,6 @@ public:
 	ExpressionTree();
 	~ExpressionTree();
 	void destroyTree();
-	bool build(std::string formulaStr);
+	std::vector<std::string> build(std::string formulaStr);
 	uint8_t evaluate(uint32_t tVal);
 };

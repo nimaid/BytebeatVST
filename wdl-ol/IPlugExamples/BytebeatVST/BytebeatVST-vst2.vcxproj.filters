@@ -10,14 +10,14 @@
     <ClCompile Include="TreeExpressions.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BytebeatVST.h" />
     <ClInclude Include="..\..\WDL\IPlug\IPlugVST.h">
       <Filter>vst2</Filter>
     </ClInclude>
+    <ClInclude Include="TreeExpressions.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Oscillator.h" />
     <ClInclude Include="MIDIReceiver.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="TreeExpressions.h" />
+    <ClInclude Include="BytebeatVST.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BytebeatVST.rc" />
