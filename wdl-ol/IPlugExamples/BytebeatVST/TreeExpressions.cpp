@@ -227,7 +227,7 @@ std::vector<std::string> ExpressionTree::build(std::string formulaStr)
 		}
 
 		//here is the central location where we append tokens, if any
-		//this is a good place to perform forward token checking
+		//this is a good place to perform token checking
 		while (formulaTokensToAppend.size() > 0)
 		{
 			formulaTokenToAppend = formulaTokensToAppend.front();
@@ -343,8 +343,20 @@ std::vector<std::string> ExpressionTree::build(std::string formulaStr)
 				}
 			}
 
-			formulaTokens.push_back(formulaTokenToAppend);
+			if (formulaTokenToAppend != " ")
+			{
+				//disregard spaces
+				formulaTokens.push_back(formulaTokenToAppend);
+			}
 		}
+	}
+
+	if (currentTokenString.size() > 0)
+	{
+		//if there was something else in the input string at the end
+		retVal.push_back(currentTokenString);
+		retVal.push_back(ETBUILD_UNRECOTOK);
+		return(retVal);
 	}
 
 	if (lParems < 0)

@@ -11,7 +11,8 @@ Oscillator::Oscillator()
 	mSampleRate = 44100.0;
 	updateIncrement();
 	//setFormula("t");
-	setFormula("(t)*5&((t)>>7)|(t*3)&(t*4>>10)");
+	setFormula("(t >> 8 & t) * t");
+	//setFormula("(t>>8&t)*t");
 	//setFormula("t*(42&(t>>11))");
 	//setFormula("t*((42&(t>>11))%24)");
 	//setFormula("(t)*5&((t)>>7)|(t*3)&(t*4>>10)");

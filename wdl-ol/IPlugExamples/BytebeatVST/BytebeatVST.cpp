@@ -37,6 +37,7 @@ BytebeatVST::BytebeatVST(IPlugInstanceInfo instanceInfo)
   */
 
   IGraphics* pGraphics = MakeGraphics(this, kWidth, kHeight);
+
   //pGraphics->AttachPanelBackground(&COLOR_RED);
   pGraphics->AttachBackground(BACKGROUND_ID, BACKGROUND_FN);
   /*
