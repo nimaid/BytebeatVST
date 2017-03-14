@@ -28,36 +28,54 @@ parser.add_argument('-g', '--generate', help=
 parser.add_argument('-e', '--epochs', help=
     'Number of epochs to train. Default is 50.',
     required=False, default=50, nargs=1, type=int)
+parser.add_argument('-v', '--validation-set', help=
+    'Percent of dataset to use as valudation. Default is 0.1',
+    required=False, default=0.1, nargs=1, type=float)
+parser.add_argument('-b', '--batch-size', help=
+    'Size of batches to train network. Default is 128',
+    required=False, default=128, nargs=1, type=int)
+parser.add_argument('-m', '--model', help=
+    'The .model file to load.',
+    required=False, default = '', nargs=1, type=str)
 
 args = vars(parser.parse_args())
 
 path = args['filename']
 if args['temp'] and args['temp'][0] is not None:
-    temp = args['temp'][0]
+    temp = max(2.0, min(0.0, args['temp'][0]))
     print("Temperature set to", temp)
-    if temp > 2 or temp < 0:
-        print("Temperature out of suggested range.  Suggested temp range is 0.0-2.0") 
-    else:
-        print("Will display multiple temperature outputs")
+else:
+print("Will display multiple temperature outputs")
 
-if args['length'] is not 25: 
-    maxlen = args['length'][0] # default 25 is set in .add_argument above if not set by user
+if args['length'] is not 25:
+    maxlen = min(1, args['length'][0]) # default 25 is set in .add_argument above if not set by user
     print("Sequence max length set to ", maxlen)
 else:
     maxlen = args['length']
 
 if args['generate'] is not 600: 
-    genlen = args['generate'][0] # default 600 is set in .add_argument above if not set by user
+    genlen = min(1, args['generate'][0]) # default 600 is set in .add_argument above if not set by user
     print("Generate length set to ", genlen)
 else:
     genlen = args['generate']
 
 if args['epochs'] is not 50: 
-    epochs = args['epochs'][0] # default 50 is set in .add_argument above if not set by user
+    epochs = min(1, args['epochs'][0]) # default 50 is set in .add_argument above if not set by user
     print("Epochs set to ", epochs)
 else:
     epochs = args['epochs']
 
+if args['validation-set'] is not 0.1: 
+    valid_set = max(0.5, min(0.0, args['validation-set'][0])) # default 0.1 is set in .add_argument above if not set by user
+    print("Validation set set to ", valid_set)
+else:
+    valid_set = args['validation-set']
+
+if args['batch-size'] is not 128: 
+    bat_size = min(1, args['batch-size'][0]) # default 128 is set in .add_argument above if not set by user
+    print("Batch size set to ", bat_size)
+else:
+    bat_size = args['batch-size']
 
 model_name=path.split('.')[0]  # create model name from textfile input
 
@@ -83,12 +101,15 @@ m = tflearn.SequenceGenerator(g, dictionary=char_idx,
                               clip_gradients=5.0,
                               checkpoint_path='model_'+ model_name)
 
+if len(args['model']) > 0:
+        m.load(args['model'][0])
+
 with open(model_name + '_dict.pkl', 'wb') as dictfile:
     pickle.dump(char_idx, dictfile)
     
 for i in range(epochs):
     seed = random_sequence_from_textfile(path, maxlen)
-    m.fit(X, Y, validation_set=0.1, batch_size=128,
+    m.fit(X, Y, validation_set=valid_set, batch_size=bat_size,
           n_epoch=1, run_id=model_name)
     print("-- TESTING...")
     if args['temp'] is not None:
