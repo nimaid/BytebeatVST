@@ -28,10 +28,10 @@ parser.add_argument('-g', '--generate', help=
 parser.add_argument('-e', '--epochs', help=
     'Number of epochs to train. Default is 50.',
     required=False, default=50, nargs=1, type=int)
-parser.add_argument('-v', '--validation-set', help=
-    'Percent of dataset to use as valudation. Default is 0.1',
+parser.add_argument('-v', '--validationset', help=
+    'Percent of dataset to use as validation. Default is 0.1',
     required=False, default=0.1, nargs=1, type=float)
-parser.add_argument('-b', '--batch-size', help=
+parser.add_argument('-b', '--batchsize', help=
     'Size of batches to train network. Default is 128',
     required=False, default=128, nargs=1, type=int)
 parser.add_argument('-m', '--model', help=
@@ -42,40 +42,40 @@ args = vars(parser.parse_args())
 
 path = args['filename']
 if args['temp'] and args['temp'][0] is not None:
-    temp = max(2.0, min(0.0, args['temp'][0]))
+    temp = min(2.0, max(0.0, args['temp'][0]))
     print("Temperature set to", temp)
 else:
-print("Will display multiple temperature outputs")
+    print("Will display multiple temperature outputs")
 
 if args['length'] is not 25:
-    maxlen = min(1, args['length'][0]) # default 25 is set in .add_argument above if not set by user
+    maxlen = max(1, args['length'][0]) # default 25 is set in .add_argument above if not set by user
     print("Sequence max length set to ", maxlen)
 else:
     maxlen = args['length']
 
 if args['generate'] is not 600: 
-    genlen = min(1, args['generate'][0]) # default 600 is set in .add_argument above if not set by user
+    genlen = max(1, args['generate'][0]) # default 600 is set in .add_argument above if not set by user
     print("Generate length set to ", genlen)
 else:
     genlen = args['generate']
 
 if args['epochs'] is not 50: 
-    epochs = min(1, args['epochs'][0]) # default 50 is set in .add_argument above if not set by user
+    epochs = max(1, args['epochs'][0]) # default 50 is set in .add_argument above if not set by user
     print("Epochs set to ", epochs)
 else:
     epochs = args['epochs']
 
-if args['validation-set'] is not 0.1: 
-    valid_set = max(0.5, min(0.0, args['validation-set'][0])) # default 0.1 is set in .add_argument above if not set by user
+if args['validationset'] is not 0.1: 
+    valid_set = min(0.5, max(0.0, args['validationset'][0])) # default 0.1 is set in .add_argument above if not set by user
     print("Validation set set to ", valid_set)
 else:
-    valid_set = args['validation-set']
+    valid_set = args['validationset']
 
-if args['batch-size'] is not 128: 
-    bat_size = min(1, args['batch-size'][0]) # default 128 is set in .add_argument above if not set by user
+if args['batchsize'] is not 128: 
+    bat_size = max(1, args['batchsize'][0]) # default 128 is set in .add_argument above if not set by user
     print("Batch size set to ", bat_size)
 else:
-    bat_size = args['batch-size']
+    bat_size = args['batchsize']
 
 model_name=path.split('.')[0]  # create model name from textfile input
 
